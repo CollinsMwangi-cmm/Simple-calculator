@@ -6,9 +6,21 @@ root.title( "Simple Calculator")
 
 f_num = None
 math = None
+history = []
 
 e = Entry(root, width=60, borderwidth=10)
 e.grid(row=0, column=0, columnspan=5, padx=10, pady=10)
+
+
+#history Display
+history_box = Text(root, width=40, height=8, state=DISABLED)
+history_box.grid(row=6,column=0, columnspan=4, padx=10, pady=10)
+
+def update_history(entry):
+    history.append(entry)
+    history_box.config(state=NORMAL)
+    history_box.insert(END, entry + "\n")
+    history_box.config(state=DISABLED)
 
 def button_click(number):
     current = e.get()
@@ -66,27 +78,39 @@ def button_percent():
 
 
 def button_equal():
+    global f_num, math
     second_number = e.get()
-    s_number = float(second_number)
+    try:
+        s_number = float(second_number)
+    except:
+        s_number = 0
     e.delete(0, END)
+    
+    result = None
+    expression =""
     
     
     if math == "addition":
         result = f_num + s_number
+        expression = f"{f_num} + {s_number} = {result}"
         
     elif math == "percent":
         result = f_num
+        expression = f"{s_number}%={result}"
     
     elif math == "subtraction":
         result =  f_num - s_number
+        expression = f"{f_num} - {s_number} = {result}"
     
     elif math == "multiplication":
         result =  f_num * s_number
+        expression= f"{f_num} * {s_number} = {result}"
     
     
     elif math == "division":
         if s_number != 0:
             result =  f_num / s_number
+            expression = f"{f_num} / {s_number} = {result}"
         else:
             e.insert(0, "Error: Div by 0") 
             return
@@ -94,10 +118,11 @@ def button_equal():
         e.insert(0, "Error: Invalid Operation")
         return
     
-    if result.is_integer():
-        e.insert(0, int(result))
-    else:
+    if result is not None:
+        if result.is_integer():
+            result = int(result)
         e.insert(0, result)
+        update_history(expression)
         
         
 def button_delete():
